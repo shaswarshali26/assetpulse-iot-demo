@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AssetPulse Asset Tracking</title>
+  <meta name="description" content="Demo concept: IoT tracking for non-powered assets with geozones, inventory, alerts and utilization analytics." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%230e7490'/><circle cx='16' cy='16' r='5' fill='white'/></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#ffffff; --bg2:#f3f7fa; --text:#0f1b2a; --muted:#566676; --primary:#0e7490; --accent:#22a6c3; --border:#e3e8ee; --dark:#0b1f2e; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0c141c; --bg2:#121d28; --text:#e6edf3; --muted:#93a4b5; --border:#233444; --primary:#22a6c3; } }
+    :root[data-theme="dark"] { --bg:#0c141c; --bg2:#121d28; --text:#e6edf3; --muted:#93a4b5; --border:#233444; --primary:#22a6c3; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:16px/1.55 Inter, system-ui, sans-serif; }
+    a { color: inherit; text-decoration: none; }
+    .wrap { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+    header { background: var(--dark); color: #fff; }
+    nav { display:flex; align-items:center; gap:28px; height:64px; }
+    .brand { display:flex; align-items:center; gap:14px; }
+    .brand-logo { height:40px; width:auto; display:block; }
+    .brand-div { width:1px; height:32px; background:rgba(255,255,255,.22); }
+    .brand-name { font-weight:800; font-size:18px; line-height:1.1; display:flex; flex-direction:column; letter-spacing:-.01em; }
+    .brand-name small { font-size:10px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:#7dd3e8; margin-top:3px; }
+    nav .links { display:flex; gap:22px; color:#b9c8d6; font-size:14px; font-weight:500; }
+    nav .links a:hover { color:#fff; }
+    .cta { margin-left:auto; background:#22a6c3; color:#04202b; font-weight:700; padding:9px 16px; border-radius:8px; font-size:14px; }
+    .hero { padding: 72px 0 88px; display:grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items:center; }
+    .eyebrow { color:#7dd3e8; font-weight:600; font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+    h1 { font-size: 46px; line-height:1.08; margin: 12px 0 18px; letter-spacing:-.02em; }
+    .hero p { color:#c4d2df; font-size:18px; max-width: 520px; }
+    .btns { display:flex; gap:12px; margin-top:28px; flex-wrap:wrap; }
+    .btn { padding: 12px 20px; border-radius: 9px; font-weight:600; }
+    .btn.primary { background:#22a6c3; color:#04202b; }
+    .btn.ghost { border:1px solid #2c4559; color:#fff; }
+    .preview { background:#0f2a3c; border:1px solid #1f3b50; border-radius:14px; padding:14px; box-shadow: 0 30px 60px rgba(0,0,0,.35); }
+    .preview svg { width:100%; height:auto; display:block; border-radius:8px; }
+    section { padding: 72px 0; }
+    section.alt { background: var(--bg2); }
+    h2 { font-size: 32px; letter-spacing:-.01em; margin:0 0 10px; }
+    .lead { color: var(--muted); max-width: 640px; margin:0 0 36px; }
+    .grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; }
+    .feat { background: var(--bg); border:1px solid var(--border); border-radius:12px; padding:22px; }
+    section.alt .feat { background: var(--bg); }
+    .feat h3 { margin: 12px 0 6px; font-size:17px; }
+    .feat p { margin:0; color: var(--muted); font-size: 15px; }
+    .ico { width:40px; height:40px; border-radius:10px; background: rgba(34,166,195,.14); color: var(--primary); display:grid; place-items:center; }
+    .ico svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    .steps { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:18px; counter-reset: s; }
+    .step { border-top: 3px solid var(--primary); padding-top: 16px; }
+    .step::before { counter-increment: s; content: "0" counter(s); font-weight:800; color: var(--primary); font-size: 14px; }
+    .step h3 { margin: 6px 0; }
+    .step p { color: var(--muted); margin:0; }
+    .tags { display:flex; flex-wrap:wrap; gap:10px; }
+    .tag { border:1px solid var(--border); border-radius:99px; padding:8px 16px; font-weight:500; background: var(--bg); }
+    .band { background: var(--dark); color:#fff; text-align:center; padding: 64px 0; }
+    .band p { color:#b9c8d6; }
+    .band { border-bottom: 1px solid #1c3446; }
+    footer { background: var(--dark); color:#93a4b5; padding: 40px 0; font-size: 13px; }
+    .foot { display:flex; align-items:center; gap:22px; flex-wrap:wrap; }
+    .foot img { height:64px; width:auto; opacity:.95; }
+    .foot b { display:block; color:#fff; font-size:15px; margin-bottom:2px; }
+    .foot .copy { margin-left:auto; text-align:right; }
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; padding: 48px 0 56px; }
+      h1 { font-size: 34px; }
+      .grid, .steps { grid-template-columns: 1fr; }
+      nav .links { display:none; }
+      .brand-name small { display:none; }
+      .brand-logo { height:32px; }
+      .foot .copy { margin-left:0; text-align:left; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <nav>
+        <a class="brand" href="#"><img class="brand-logo" src="img/iq-labs-logo.svg" alt="iQ Labs" /><span class="brand-div" aria-hidden="true"></span><span class="brand-name">AssetPulse<small>IoT asset tracking</small></span></a>
+        <div class="links"><a href="#platform">Platform</a><a href="#hardware">Trackers</a><a href="#industries">Industries</a><a href="#how">How it works</a></div>
+        <a class="cta" href="app.html">Launch live demo</a>
+      </nav>
+      <div class="hero">
+        <div>
+          <div class="eyebrow">Tracking for non-powered assets</div>
+          <h1>Know where every container, stillage and trailer is, and what it’s doing.</h1>
+          <p>Battery-powered trackers, geozones and analytics in one platform. Cut asset loss, right-size your fleet and stop searching yards.</p>
+          <div class="btns">
+            <a class="btn primary" href="app.html">Open the live demo</a>
+            <a class="btn ghost" href="#platform">Explore the platform</a>
+          </div>
+        </div>
+        <div class="preview" aria-hidden="true">
+          <svg viewBox="0 0 400 260">
+            <rect width="400" height="260" fill="#13324a" />
+            <path d="M60 200 Q140 120 210 150 T350 70" stroke="#2c5875" stroke-width="3" fill="none" stroke-dasharray="6 6" />
+            <path d="M80 70 Q170 90 210 150" stroke="#2c5875" stroke-width="3" fill="none" stroke-dasharray="6 6" />
+            <circle cx="60" cy="200" r="26" fill="rgba(34,166,195,.15)" stroke="#22a6c3" stroke-dasharray="3 3" />
+            <circle cx="210" cy="150" r="32" fill="rgba(34,166,195,.15)" stroke="#22a6c3" stroke-dasharray="3 3" />
+            <circle cx="350" cy="70" r="24" fill="rgba(34,166,195,.15)" stroke="#22a6c3" stroke-dasharray="3 3" />
+            <circle cx="80" cy="70" r="20" fill="rgba(34,166,195,.15)" stroke="#22a6c3" stroke-dasharray="3 3" />
+            <g stroke="#fff" stroke-width="1.5">
+              <circle cx="52" cy="195" r="5" fill="#16a34a" /><circle cx="66" cy="206" r="5" fill="#16a34a" /><circle cx="70" cy="192" r="5" fill="#d97706" />
+              <circle cx="200" cy="145" r="5" fill="#16a34a" /><circle cx="218" cy="158" r="5" fill="#16a34a" /><circle cx="214" cy="140" r="5" fill="#16a34a" />
+              <circle cx="140" cy="140" r="5" fill="#2563eb" /><circle cx="285" cy="104" r="5" fill="#2563eb" /><circle cx="160" cy="98" r="5" fill="#2563eb" />
+              <circle cx="345" cy="66" r="5" fill="#16a34a" /><circle cx="300" cy="200" r="6" fill="#dc2626" />
+            </g>
+            <rect x="250" y="180" width="134" height="62" rx="8" fill="#0b1f2e" stroke="#2c4559" />
+            <text x="262" y="200" fill="#fca5a5" font-size="11" font-family="Inter" font-weight="600">Unexpected movement</text>
+            <text x="262" y="218" fill="#b9c8d6" font-size="10" font-family="Inter">TRL-1007 left all geozones</text>
+            <text x="262" y="232" fill="#7d93a6" font-size="9" font-family="Inter">2 min ago</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="platform">
+    <div class="wrap">
+      <h2>One platform, every asset</h2>
+      <p class="lead">From live location to fleet sizing, every view is built from the sparse, battery-friendly reports that low-power trackers send.</p>
+      <div class="grid">
+        <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/><circle cx="12" cy="10" r="3"/></svg></div><h3>Live map and journeys</h3><p>See each asset’s last reported position, trail and destination, and search by ID.</p></div>
+        <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="2"/></svg></div><h3>Geozones and visits</h3><p>Draw sites, count arrivals and departures, and measure how long assets dwell.</p></div>
+        <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg></div><h3>Inventory and stock levels</h3><p>Set minimum and maximum stock per site and get warned before a line runs dry.</p></div>
+        <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><h3>Smart alerts</h3><p>Unexpected movement, idle assets, temperature excursions, low battery and offline trackers.</p></div>
+        <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-4 3 3 5-6"/></svg></div><h3>Utilization analytics</h3><p>Cycle times, dwell times and stock evolution show whether you have too many assets or too few.</p></div>
+        <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></div><h3>Maintenance management</h3><p>Count cycles per asset and route equipment to repair when service is due.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="hardware" class="alt">
+    <div class="wrap">
+      <h2>Trackers built to outlast the asset</h2>
+      <p class="lead">Three device families cover everything from trailers to roll cages. The demo simulates how each one reports.</p>
+      <div class="grid">
+        <div class="feat"><h3>Smart tracker</h3><p>GNSS, Wi-Fi and network positioning over LTE-M. Reports every 15 minutes in motion and every 6 hours at rest, with a multi-year battery.</p></div>
+        <div class="feat"><h3>BLE location tag</h3><p>A low-cost tag for high-volume assets. Gateways inside geozones pick it up, so you get site-level presence at scale.</p></div>
+        <div class="feat"><h3>Condition sensor</h3><p>Adds temperature and fill level for IBCs and sensitive goods, with NB-IoT connectivity and threshold alerts.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="industries">
+    <div class="wrap">
+      <h2>Industries</h2>
+      <p class="lead">Wherever returnable or high-value equipment moves between sites.</p>
+      <div class="tags">
+        <span class="tag">Automotive and equipment manufacturing</span><span class="tag">Aerospace</span><span class="tag">Transport and logistics</span>
+        <span class="tag">Multimodal and ports</span><span class="tag">Construction</span><span class="tag">Airport ground support</span>
+        <span class="tag">Waste and recycling</span><span class="tag">Rental equipment</span><span class="tag">Chemicals (IBCs)</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="alt">
+    <div class="wrap">
+      <h2>How it works</h2>
+      <p class="lead">Tracking as a service: hardware, connectivity and software for one fee per asset.</p>
+      <div class="steps">
+        <div class="step"><h3>Attach</h3><p>Screw, rivet or strap a tracker on. No wiring and no power needed.</p></div>
+        <div class="step"><h3>Connect</h3><p>Devices report over LPWAN, cellular or BLE gateways and stay asleep in between.</p></div>
+        <div class="step"><h3>Act</h3><p>Dashboards, alerts and ERP, WMS or TMS integrations turn location data into decisions.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="band">
+    <div class="wrap">
+      <h2>See it run on 122 simulated assets</h2>
+      <p>Eight geozones around Sulaymaniyah in the Kurdistan Region of Iraq, with injectable incidents.</p>
+      <div class="btns" style="justify-content:center"><a class="btn primary" href="app.html">Launch live demo</a></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap foot">
+      <img src="img/iq-labs-logo.svg" alt="iQ Labs" />
+      <div><b>Designed and built by iQ Labs</b>AssetPulse is a demo concept. All assets, sites and events are simulated in your browser.</div>
+      <div class="copy">© 2026 iQ Labs<br />Sulaymaniyah, Kurdistan Region of Iraq</div>
+    </div>
+  </footer>
+</body>
+</html>

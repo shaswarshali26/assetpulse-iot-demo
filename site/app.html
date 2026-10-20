@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AssetPulse Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%230e7490'/><circle cx='16' cy='16' r='5' fill='white'/></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><img class="brand-logo" src="img/iq-labs-logo.svg" alt="iQ Labs" /><span class="brand-div" aria-hidden="true"></span><span class="brand-name">AssetPulse<small>IoT asset tracking</small></span></a>
+    <span class="demo-badge">DEMO · simulated data</span>
+    <div class="clock">
+      <span class="clock-label">Simulation time</span>
+      <span id="clock">—</span>
+    </div>
+    <div class="controls">
+      <button id="playBtn" class="btn btn-icon" title="Pause / play" aria-label="Pause or play">❚❚</button>
+      <select id="speedSel" aria-label="Simulation speed">
+        <option value="1">1× (4 min/s)</option>
+        <option value="5" selected>5× (20 min/s)</option>
+        <option value="15">15× (1 h/s)</option>
+        <option value="60">60× (4 h/s)</option>
+      </select>
+    </div>
+  </header>
+
+  <nav class="sidebar" id="nav">
+    <a href="#dashboard" data-view="dashboard"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Live map</span></a>
+    <a href="#assets" data-view="assets"><svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg><span>Assets</span></a>
+    <a href="#geozones" data-view="geozones"><svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/></svg><span>Geozones</span></a>
+    <a href="#alerts" data-view="alerts"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg><span>Alerts</span><b class="count" id="navAlertCount">0</b></a>
+    <a href="#analytics" data-view="analytics"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-4 3 3 5-6"/></svg><span>Analytics</span></a>
+    <a href="#simulator" data-view="simulator"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Simulator</span></a>
+  </nav>
+
+  <main>
+    <!-- LIVE MAP -->
+    <section class="view" id="view-dashboard">
+      <div class="kpis" id="kpis"></div>
+      <div class="dash-grid">
+        <div class="card map-card">
+          <div class="map-toolbar">
+            <input id="mapSearch" type="search" placeholder="Find asset ID…" />
+            <div class="chips" id="statusChips"></div>
+            <select id="mapType" aria-label="Asset type"><option value="">All types</option></select>
+          </div>
+          <div id="map"></div>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div class="side-col">
+          <div class="card">
+            <h3>Stock by geozone</h3>
+            <div id="stockBars"></div>
+          </div>
+          <div class="card">
+            <h3>Latest alerts <a href="#alerts" class="more">View all</a></h3>
+            <ul class="alert-list" id="dashAlerts"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ASSETS -->
+    <section class="view" id="view-assets">
+      <div class="view-head">
+        <h2>Assets</h2>
+        <div class="filters">
+          <input id="assetSearch" type="search" placeholder="Search ID, type, location…" />
+          <select id="assetType"><option value="">All types</option></select>
+          <select id="assetStatus"><option value="">All statuses</option></select>
+        </div>
+      </div>
+      <div class="card table-card">
+        <table class="table" id="assetTable">
+          <thead><tr>
+            <th data-sort="id">Asset</th><th data-sort="type">Type</th><th data-sort="tracker">Tracker</th>
+            <th data-sort="status">Status</th><th data-sort="loc">Last location</th><th data-sort="seen">Last seen</th>
+            <th data-sort="battery">Battery</th><th data-sort="dwell">Dwell</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- GEOZONES -->
+    <section class="view" id="view-geozones">
+      <div class="view-head"><h2>Geozones</h2><p class="muted">Inventory, visits and dwell time per site. Stock counts use the last reported position of each tracker.</p></div>
+      <div class="zone-grid" id="zoneGrid"></div>
+      <div class="card">
+        <h3>Recent geozone visits</h3>
+        <div class="table-wrap"><table class="table" id="visitTable"><thead><tr><th>Asset</th><th>Type</th><th>Geozone</th><th>Entered</th><th>Left</th><th>Dwell</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- ALERTS -->
+    <section class="view" id="view-alerts">
+      <div class="view-head">
+        <h2>Alerts</h2>
+        <div class="filters">
+          <select id="alertStatus"><option value="open">Open</option><option value="acknowledged">Acknowledged</option><option value="resolved">Resolved</option><option value="">All</option></select>
+          <select id="alertSev"><option value="">All severities</option><option value="critical">Critical</option><option value="warning">Warning</option><option value="info">Info</option></select>
+          <button class="btn" id="ackAll">Acknowledge all open</button>
+        </div>
+      </div>
+      <div class="card table-card">
+        <table class="table" id="alertTable"><thead><tr><th>Severity</th><th>Rule</th><th>Details</th><th>Raised</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section class="view" id="view-analytics">
+      <div class="view-head"><h2>Analytics</h2><p class="muted">Utilization, stock evolution, dwell and cycle times computed from the simulated tracker history.</p></div>
+      <div class="chart-grid">
+        <div class="card wide"><h3>Stock evolution per geozone (last 7 days)</h3><div class="chart-box tall"><canvas id="chStock"></canvas></div></div>
+        <div class="card"><h3>Utilization by asset type</h3><p class="muted small">Share of time moving or at a plant/customer</p><div class="chart-box"><canvas id="chUtil"></canvas></div></div>
+        <div class="card"><h3>Average dwell time per geozone (hours)</h3><div class="chart-box"><canvas id="chDwell"></canvas></div></div>
+        <div class="card"><h3>Average cycle time (days)</h3><p class="muted small">Return-trip time to the circuit start site</p><div class="chart-box"><canvas id="chCycle"></canvas></div></div>
+        <div class="card"><h3>Battery level distribution</h3><div class="chart-box"><canvas id="chBattery"></canvas></div></div>
+      </div>
+    </section>
+
+    <!-- SIMULATOR -->
+    <section class="view" id="view-simulator">
+      <div class="view-head"><h2>Simulator</h2><p class="muted">Inject real-world situations and watch the platform react: alerts fire, statuses change and the map updates.</p></div>
+      <div class="sim-grid">
+        <div class="card">
+          <h3>Scenarios</h3>
+          <div class="scenarios">
+            <button class="scenario" data-scn="theft"><b>Unauthorized movement</b><span>A tracked asset leaves its geozone and travels off-route.</span></button>
+            <button class="scenario" data-scn="temp"><b>Temperature excursion</b><span>An IBC container is exposed to heat for 8 hours.</span></button>
+            <button class="scenario" data-scn="lost"><b>Forgotten asset</b><span>An asset stays at a site longer than the idle limit.</span></button>
+            <button class="scenario" data-scn="battery"><b>Battery drain</b><span>A tracker battery drops below the 15% threshold.</span></button>
+            <button class="scenario" data-scn="shortage"><b>Stock shortage</b><span>The Sulaymaniyah Industrial Zone dispatches nearly all its assets at once.</span></button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Settings</h3>
+          <label class="row"><span>Idle asset threshold (days)</span><input type="number" id="idleDays" min="1" max="14" value="4" /></label>
+          <label class="row"><span>Show true positions (ignores reporting delay)</span><input type="checkbox" id="groundTruth" /></label>
+          <label class="row"><span>Random seed</span><input type="number" id="seed" value="7" /></label>
+          <button class="btn" id="resetBtn">Restart simulation</button>
+          <div class="note">
+            <b>How reporting works</b>
+            <p>Smart trackers report every 15 min while moving and every 6 h at rest. BLE tags are only heard by gateways inside geozones, so in transit they keep their last-seen site until they reach the next one. Condition sensors add temperature and fill level.</p>
+          </div>
+        </div>
+        <div class="card wide">
+          <h3>Live event stream</h3>
+          <ul class="event-log" id="eventLog"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <button class="drawer-close" id="drawerClose" aria-label="Close">×</button>
+    <div id="drawerBody"></div>
+  </aside>
+  <div class="toast-wrap" id="toasts"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="js/sim.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
