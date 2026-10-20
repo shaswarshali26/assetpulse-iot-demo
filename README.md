@@ -1,6 +1,6 @@
 # AssetPulse IoT tracking demo
 
-A browser-only simulation of an IoT asset-tracking platform for non-powered assets (stillages, roll cages, IBC containers, trailers, tooling, pallet boxes) moving between eight geozones around Sulaymaniyah, Kurdistan Region of Iraq. Built by iQ Labs.
+A browser-only simulation of an IoT asset-tracking platform for non-powered assets moving between 41 geozones in 10 cities across Iraq (Duhok, Erbil, Mosul, Kirkuk, Sulaymaniyah, Baghdad, Ramadi, Karbala, Najaf, Basra), with a city filter across every view. Built by iQ Labs.
 
 Live: https://assetpulse-iot-demo.netlify.app
 

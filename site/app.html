@@ -14,6 +14,10 @@
   <header class="topbar">
     <a class="brand" href="index.html"><img class="brand-logo" src="img/iq-labs-logo.svg" alt="iQ Labs" /><span class="brand-div" aria-hidden="true"></span><span class="brand-name">AssetPulse<small>IoT asset tracking</small></span></a>
     <span class="demo-badge">DEMO · simulated data</span>
+    <label class="city-pick" title="Filter every view by city">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="10" r="3"/><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/></svg>
+      <select id="citySel" aria-label="City"></select>
+    </label>
     <div class="clock">
       <span class="clock-label">Simulation time</span>
       <span id="clock">—</span>
@@ -54,7 +58,7 @@
         </div>
         <div class="side-col">
           <div class="card">
-            <h3>Stock by geozone</h3>
+            <h3 id="stockTitle">Stock by geozone</h3>
             <div id="stockBars"></div>
           </div>
           <div class="card">
@@ -68,7 +72,7 @@
     <!-- ASSETS -->
     <section class="view" id="view-assets">
       <div class="view-head">
-        <h2>Assets</h2>
+        <h2>Assets <span class="scope city-name"></span> <span class="muted count-note" id="assetCount"></span></h2>
         <div class="filters">
           <input id="assetSearch" type="search" placeholder="Search ID, type, location…" />
           <select id="assetType"><option value="">All types</option></select>
@@ -78,7 +82,7 @@
       <div class="card table-card">
         <table class="table" id="assetTable">
           <thead><tr>
-            <th data-sort="id">Asset</th><th data-sort="type">Type</th><th data-sort="tracker">Tracker</th>
+            <th data-sort="id">Asset</th><th data-sort="type">Type</th><th data-sort="city">City</th><th data-sort="tracker">Tracker</th>
             <th data-sort="status">Status</th><th data-sort="loc">Last location</th><th data-sort="seen">Last seen</th>
             <th data-sort="battery">Battery</th><th data-sort="dwell">Dwell</th>
           </tr></thead>
@@ -89,18 +93,18 @@
 
     <!-- GEOZONES -->
     <section class="view" id="view-geozones">
-      <div class="view-head"><h2>Geozones</h2><p class="muted">Inventory, visits and dwell time per site. Stock counts use the last reported position of each tracker.</p></div>
-      <div class="zone-grid" id="zoneGrid"></div>
+      <div class="view-head"><h2>Geozones <span class="scope city-name"></span></h2><p class="muted">Inventory, visits and dwell time per site. Stock counts use the last reported position of each tracker.</p></div>
+      <div id="zoneGrid"></div>
       <div class="card">
         <h3>Recent geozone visits</h3>
-        <div class="table-wrap"><table class="table" id="visitTable"><thead><tr><th>Asset</th><th>Type</th><th>Geozone</th><th>Entered</th><th>Left</th><th>Dwell</th></tr></thead><tbody></tbody></table></div>
+        <div class="table-wrap"><table class="table" id="visitTable"><thead><tr><th>Asset</th><th>Type</th><th>Geozone</th><th>City</th><th>Entered</th><th>Left</th><th>Dwell</th></tr></thead><tbody></tbody></table></div>
       </div>
     </section>
 
     <!-- ALERTS -->
     <section class="view" id="view-alerts">
       <div class="view-head">
-        <h2>Alerts</h2>
+        <h2>Alerts <span class="scope city-name"></span></h2>
         <div class="filters">
           <select id="alertStatus"><option value="open">Open</option><option value="acknowledged">Acknowledged</option><option value="resolved">Resolved</option><option value="">All</option></select>
           <select id="alertSev"><option value="">All severities</option><option value="critical">Critical</option><option value="warning">Warning</option><option value="info">Info</option></select>
@@ -108,17 +112,17 @@
         </div>
       </div>
       <div class="card table-card">
-        <table class="table" id="alertTable"><thead><tr><th>Severity</th><th>Rule</th><th>Details</th><th>Raised</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
+        <table class="table" id="alertTable"><thead><tr><th>Severity</th><th>Rule</th><th>Details</th><th>City</th><th>Raised</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
       </div>
     </section>
 
     <!-- ANALYTICS -->
     <section class="view" id="view-analytics">
-      <div class="view-head"><h2>Analytics</h2><p class="muted">Utilization, stock evolution, dwell and cycle times computed from the simulated tracker history.</p></div>
+      <div class="view-head"><h2>Analytics <span class="scope city-name"></span></h2><p class="muted">Utilization, stock evolution, dwell and cycle times computed from the simulated tracker history.</p></div>
       <div class="chart-grid">
-        <div class="card wide"><h3>Stock evolution per geozone (last 7 days)</h3><div class="chart-box tall"><canvas id="chStock"></canvas></div></div>
+        <div class="card wide"><h3 id="stockChartTitle">Stock evolution (last 7 days)</h3><div class="chart-box tall"><canvas id="chStock"></canvas></div></div>
         <div class="card"><h3>Utilization by asset type</h3><p class="muted small">Share of time moving or at a plant/customer</p><div class="chart-box"><canvas id="chUtil"></canvas></div></div>
-        <div class="card"><h3>Average dwell time per geozone (hours)</h3><div class="chart-box"><canvas id="chDwell"></canvas></div></div>
+        <div class="card"><h3 id="dwellChartTitle">Average dwell time (hours)</h3><div class="chart-box"><canvas id="chDwell"></canvas></div></div>
         <div class="card"><h3>Average cycle time (days)</h3><p class="muted small">Return-trip time to the circuit start site</p><div class="chart-box"><canvas id="chCycle"></canvas></div></div>
         <div class="card"><h3>Battery level distribution</h3><div class="chart-box"><canvas id="chBattery"></canvas></div></div>
       </div>
@@ -126,16 +130,17 @@
 
     <!-- SIMULATOR -->
     <section class="view" id="view-simulator">
-      <div class="view-head"><h2>Simulator</h2><p class="muted">Inject real-world situations and watch the platform react: alerts fire, statuses change and the map updates.</p></div>
+      <div class="view-head"><h2>Simulator <span class="scope city-name"></span></h2><p class="muted">Inject real-world situations and watch the platform react: alerts fire, statuses change and the map updates.</p></div>
       <div class="sim-grid">
         <div class="card">
           <h3>Scenarios</h3>
+          <p class="muted small" style="margin:-6px 0 10px">Scenarios run in the city selected at the top (<span class="city-name"></span>).</p>
           <div class="scenarios">
             <button class="scenario" data-scn="theft"><b>Unauthorized movement</b><span>A tracked asset leaves its geozone and travels off-route.</span></button>
             <button class="scenario" data-scn="temp"><b>Temperature excursion</b><span>An IBC container is exposed to heat for 8 hours.</span></button>
             <button class="scenario" data-scn="lost"><b>Forgotten asset</b><span>An asset stays at a site longer than the idle limit.</span></button>
             <button class="scenario" data-scn="battery"><b>Battery drain</b><span>A tracker battery drops below the 15% threshold.</span></button>
-            <button class="scenario" data-scn="shortage"><b>Stock shortage</b><span>The Sulaymaniyah Industrial Zone dispatches nearly all its assets at once.</span></button>
+            <button class="scenario" data-scn="shortage"><b>Stock shortage</b><span>The busiest plant in the selected area dispatches nearly all its assets at once.</span></button>
           </div>
         </div>
         <div class="card">
@@ -150,7 +155,7 @@
           </div>
         </div>
         <div class="card wide">
-          <h3>Live event stream</h3>
+          <h3>Live event stream · <span class="city-name"></span></h3>
           <ul class="event-log" id="eventLog"></ul>
         </div>
       </div>
